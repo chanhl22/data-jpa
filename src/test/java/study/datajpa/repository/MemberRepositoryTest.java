@@ -147,4 +147,28 @@ class MemberRepositoryTest {
                 );
     }
 
+    @Test
+    void returnType() {
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> result1 = memberRepository.findListByUsername("AAA");
+        Member result2 = memberRepository.findMemberByUsername("AAA");
+        Optional<Member> result3 = memberRepository.findOptionalByUsername("AAA");
+
+        assertThat(result1).hasSize(1)
+                .extracting("username", "age")
+                .containsExactlyInAnyOrder(
+                        tuple("AAA", 10)
+                );
+        assertThat(result2)
+                .extracting("username", "age")
+                .contains("AAA", 10);
+        assertThat(result3.get())
+                .extracting("username", "age")
+                .contains("AAA", 10);
+    }
+
 }
