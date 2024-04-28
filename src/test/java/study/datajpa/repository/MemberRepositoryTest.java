@@ -298,7 +298,7 @@ class MemberRepositoryTest {
             System.out.println("member.teamClass = " + member.getTeam().getClass());
             System.out.println("member.getTeam().getName() = " + member.getTeam().getName());
         }
-        
+
         assertThat(members).hasSize(2)
                 .extracting("username")
                 .containsExactlyInAnyOrder("member1", "member2");
@@ -335,6 +335,34 @@ class MemberRepositoryTest {
                 .containsExactlyInAnyOrder("member1", "member1");
         assertThat(members.get(0).getTeam().getName()).isEqualTo("teamA");
         assertThat(members.get(1).getTeam().getName()).isEqualTo("teamB");
+    }
+
+    @Test
+    public void queryHint() throws Exception {
+        //given
+        Member member = new Member("member1", 10);
+        memberRepository.save(member);
+
+        em.flush();
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+
+        em.flush(); //Update Query 실행X
+    }
+
+    @Test
+    public void lock() {
+        //given
+        Member member = new Member("member1", 10);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> result = memberRepository.findLockByUsername("member1");
     }
 
 }
